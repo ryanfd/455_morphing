@@ -36,19 +36,33 @@ class Morphing extends Frame {
 				);//end addWindowListener
 	}// end constructor
 	
-	protected int getRed(int pixel) 
+	// accessors
+	protected int getRed(int pixel) { return (pixel >>> 16) & 0xFF; }
+	protected int getGreen(int pixel) { return (pixel >>> 8) & 0xFF; }
+	protected int getBlue(int pixel) { return pixel & 0xFF; }
+	
+	// vector
+	// need to find what exactly this is for
+	private int vectorMap(int pixel)
 	{
-		return (pixel >>> 16) & 0xFF;
+		return pixel;
 	}
-
-	protected int getGreen(int pixel) 
+	
+	// create map of composite image based on separated images
+	private int compositeMap(int pixel, Operations ops)
 	{
-		return (pixel >>> 8) & 0xFF;
-	}
-
-	protected int getBlue(int pixel) 
-	{
-		return pixel & 0xFF;
+		int result;
+		
+		switch(ops) {
+		case subtract: // first image
+			result = pixel - vectorMap(pixel);
+		case add: // second image
+			result = pixel + vectorMap(pixel);
+		default:
+			result = 0;
+		}
+		
+		return result;
 	}
 
 	public void paint(Graphics g) 
