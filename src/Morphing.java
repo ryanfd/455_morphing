@@ -17,6 +17,8 @@ import java.io.File;
 
 import javax.imageio.ImageIO;
 
+import org.opencv.core.Core;
+
 class Morphing extends Frame { 
 
 	public Morphing() {
@@ -73,9 +75,11 @@ class Morphing extends Frame {
 
 	public static void main(String[] args) 
 	{
+		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+        FeatureDetection fd = new FeatureDetection();
 	
-		Morphing img = new Morphing();// instantiate this object
-		img.repaint();// render the image
+//		Morphing img = new Morphing();// instantiate this object
+//		img.repaint();// render the image
 	
 	}// end main
 }
