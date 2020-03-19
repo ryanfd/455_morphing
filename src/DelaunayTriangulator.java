@@ -82,6 +82,227 @@ class tree {
 			node[i].y = new Integer(inputFile.readLine()).intValue();
 		}
 	}
+	
+	// create initial triangle: includes points
+	static void getStart()
+	{
+		int maxX, maxY, m;
+		int i,j;
+		maxX = Math.abs(node[0].x);
+		maxY = Math.abs(node[0].y);
+		
+		// find max absolute value of coordinates of points
+		for (int index=1; index<vertexNumber; index++) {
+			if (maxX < Math.abs(node[index].x)) maxX = Math.abs(node[index].x);
+			if (maxY < Math.abs(node[index].y)) maxY = Math.abs(node[index].y);
+		}
+		
+		m = maxX;
+		if (maxY > maxX) m = maxY;
+		
+		vertex[] bound;
+		bound = new vertex[3];
+		bound[0] = new vertex(0, 3*m); // set coords of 3 triangle top points
+		bound[1] = new vertex(3*m, 0);
+		bound[2] = new vertex(-3*m, -3*m);
+		
+		edge e1 = new edge();
+		edge e2 = new edge();
+		edge e3 = new edge();
+		
+		e1.origin = bound[0];
+		e1.destin = bound[1];
+		e2.origin = bound[1];
+		e2.destin = bound[2];
+		e3.origin = bound[2];
+		e3.destin = bound[0];
+		
+		// give each edge next, previous and twin
+		e1.next = e2;
+		e1.prev = e3;
+		e1.twin = null;
+		
+		e2.next = e3;
+		e2.prev = e1;
+		e2.twin = null;
+		
+		e3.next = e1;
+		e3.prev = e2;
+		e3.twin = null;
+		
+		triangle temp = new triangle();
+		temp.triEdge1 = e1;
+		temp.triEdge2 = e2;
+		temp.triEdge3 = e3;
+		
+		// children are null before triangulation
+		temp.child1 = null;
+		temp.child2 = null;
+		temp.child3 = null;
+		root = temp;
+	}
+	
+	// print leaves of tree
+	// NOTE: leaves are triangles
+	static void printLeaf(triangle myTriangle) throws IOException
+	{
+		triangle temp = new triangle();
+		myTriangle.flag = 1; // triangle has been visited
+		temp = myTriangle;
+		
+		if (temp.child1 == null) {
+			triangleNumber++;
+			screen.println(temp.triEdge1.origin.x + "," + temp.triEdge1.origin.y + "->" + 
+			temp.triEdge1.destin.x + "," + temp.triEdge1.destin.y + "->" + temp.triEdge1.next.destin.x + "," + temp.triEdge1.next.destin.y);
+			
+			// put coords in output file
+			outputFile.println(temp.triEdge1.origin.x);
+			outputFile.println(temp.triEdge1.origin.y);
+			outputFile.println(temp.triEdge1.destin.x);
+			outputFile.println(temp.triEdge1.destin.y);
+			outputFile.println(temp.triEdge1.next.destin.x);
+			outputFile.println(temp.triEdge1.next.destin.y);
+			
+			return;
+		}
+		
+		if (temp.child1 != null && temp.child1.flag == 0) printLeaf(temp.child1);
+		if (temp.child2 != null && temp.child2.flag == 0) printLeaf(temp.child2);
+		if (temp.child3 != null && temp.child3.flag == 0) printLeaf(temp.child3);
+	}
+	
+	// count created triangles and search from graph
+	static void getNumberOfTriangles(triangle myTriangle)
+	{
+		triangle temp = new triangle();
+		myTriangle.flag1 = 1;
+		temp = myTriangle;
+		
+		if (temp.child1 == null) {
+			triangleNumber1++;
+			return;
+		}
+		if (temp.child1 != null && temp.child1.flag1 == 0) getNumberOfTriangles(temp.child1);
+		if (temp.child2 != null && temp.child2.flag1 == 0) getNumberOfTriangles(temp.child2);
+		if (temp.child3 != null && temp.child3.flag1 == 0) getNumberOfTriangles(temp.child3);
+	}
+	
+	// splitting and flipping
+	// This monstrosity of a method is brought to you by the textbook pdf that I followed along with.
+	// I would just like to point out that I hated every second of writing this method because it is painful to look at.
+	static void splitAndFlip(vertex myNode, triangle myTriangle)
+	{
+		int i,j;
+		int d1,d2,d3;
+		
+		triangle temp = new triangle();
+		triangle temp1 = new triangle();
+		triangle temp2 = new triangle();
+		triangle temp3 = new triangle();
+		triangle temp4 = new triangle();
+		
+		// verify if point lies on edge
+		d1 = criter(myTriangle.triEdge1.origin.x,
+				myTriangle.triEdge1.origin.y,
+				myTriangle.triEdge1.destin.x,
+				myTriangle.triEdge1.destin.y,
+				myNode.x, myNode.y);
+		
+		d2 = criter(myTriangle.triEdge2.origin.x,
+				myTriangle.triEdge2.origin.y,
+				myTriangle.triEdge2.destin.x,
+				myTriangle.triEdge2.destin.y,
+				myNode.x, myNode.y);
+		
+		d3 = criter(myTriangle.triEdge3.origin.x,
+				myTriangle.triEdge3.origin.y,
+				myTriangle.triEdge3.destin.x,
+				myTriangle.triEdge3.destin.y,
+				myNode.x, myNode.y);
+		
+		// if a point lies within a triangle, must split into three triangles
+		if (d1 != 0 &&
+			d2 != 0 &&
+			d3 != 0) {
+			// get info and split
+			edge e1 = new edge();
+			edge twin1 = new edge();
+			edge e2 = new edge();
+			edge twin2 = new edge();
+			edge e3 = new edge();
+			edge twin3 = new edge();
+			
+			e1.origin = myNode;
+			e1.destin = myTriangle.triEdge1.origin;
+			twin1.origin = e1.destin;
+			twin1.destin = e1.origin;
+			e1.twin = twin1;
+			twin1.twin = e1;
+			
+			e2.origin = myNode;
+			e2.destin = myTriangle.triEdge1.destin;
+			twin2.origin = e2.destin;
+			twin2.destin = e2.origin;
+			e2.twin = twin2;
+			twin2.twin = e2;
+			
+			e3.origin = myNode;
+			e3.destin = myTriangle.triEdge2.destin;
+			twin3.origin = e3.destin;
+			twin3.destin = e3.origin;
+			e3.twin = twin3;
+			twin3.twin = e3;
+			
+			e1.next = myTriangle.triEdge1;
+			e1.prev = twin2;
+			myTriangle.triEdge1.next = twin2;
+			myTriangle.triEdge1.prev = e1;
+			twin2.next = e1;
+			twin2.prev = myTriangle.triEdge1;
+			
+			temp1.triEdge1 = e1;
+			temp1.triEdge2 = myTriangle.triEdge1;
+			temp.triEdge3 = twin2;
+			updateEdge(temp1);
+			
+			e2.next = myTriangle.triEdge2;
+			e2.prev = twin3;
+			myTriangle.triEdge2.next = twin3;
+			myTriangle.triEdge2.prev = e2;
+			twin3.next = e2;
+			twin3.prev = myTriangle.triEdge2;
+			
+			temp2.triEdge1 = e2;
+			temp2.triEdge2 = myTriangle.triEdge2;
+			temp2.triEdge3 = twin3;
+			updateEdge(temp2);
+			
+			e3.next = myTriangle.triEdge3;
+			e3.prev = twin1;
+			myTriangle.triEdge3.next = twin1;
+			myTriangle.triEdge3.prev = e3;
+			twin1.next = e3;
+			twin1.prev = myTriangle.triEdge3;
+			
+			temp3.triEdge1 = e3;
+			temp3.triEdge2 = myTriangle.triEdge3;
+			temp3.triEdge3 = twin1;
+			updateEdge(temp3);
+			
+			temp1.child1 = temp1.child2 = temp1.child3 = null;
+			temp2.child1 = temp2.child2 = temp2.child3 = null;
+			temp3.child1 = temp3.child2 = temp3.child3 = null;
+			
+			myTriangle.child1 = temp1;
+			myTriangle.child2 = temp2;
+			myTriangle.child3 = temp3;
+			
+			// flip each edge of triangle until legal triangle is found
+			legalizeEdge(myNode, myTriangle.triEdge1);
+			legalizeEdge(myNode, myTriangle.triEdge2);
+			legalizeEdge(myNode, myTriangle.triEdge3);
+		}
+	}
 }
 
 
