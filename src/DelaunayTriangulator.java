@@ -221,9 +221,7 @@ class tree {
 				myNode.x, myNode.y);
 		
 		// if a point lies within a triangle, must split into three triangles
-		if (d1 != 0 &&
-			d2 != 0 &&
-			d3 != 0) {
+		if (d1 != 0 && d2 != 0 && d3 != 0) {
 			// get info and split
 			edge e1 = new edge();
 			edge twin1 = new edge();
@@ -301,6 +299,125 @@ class tree {
 			legalizeEdge(myNode, myTriangle.triEdge1);
 			legalizeEdge(myNode, myTriangle.triEdge2);
 			legalizeEdge(myNode, myTriangle.triEdge3);
+		} else {
+			// if point is on edge of triangle, it splits into 4
+			edge tempEdge = new edge();
+			
+			edge e1 = new edge();
+			edge twin1 = new edge();
+			edge e2 = new edge();
+			edge twin2 = new edge();
+			edge e3 = new edge();
+			edge twin3 = new edge();
+			edge e4 = new edge();
+			edge twin4 = new edge();
+			
+			// look for edge containing the point
+			if (d1 == 0) tempEdge = myTriangle.triEdge1; 
+			if (d2 == 0) tempEdge = myTriangle.triEdge2; 
+			if (d3 == 0) tempEdge = myTriangle.triEdge3;
+			
+			// find corresponding twin's edge
+			temp = findTriangle(root, tempEdge.twin);
+			
+			// create 4 new triangles and set them as child of current
+			e1.origin = tempEdge.origin;
+			e1.destin = myNode;
+			twin1.origin = e1.destin;
+			twin1.destin = e1.origin;
+			e1.twin = twin1;
+			twin1.twin = e1;
+			
+			e2.origin = myNode;
+			e2.destin = tempEdge.destin;
+			twin2.origin = e2.destin;
+			twin2.destin = e2.origin;
+			e2.twin = twin2;
+			twin2.twin = e2;
+			
+			e3.origin = myNode;
+			e3.destin = tempEdge.next.destin;
+			twin3.origin = e3.destin;
+			twin3.destin = e3.origin;
+			e3.twin = twin3;
+			twin3.twin = e3;
+			
+			e4.origin = myNode;
+			e4.destin = tempEdge.twin.next.destin;
+			twin4.origin = e4.destin;
+			twin4.destin = e4.origin;
+			e4.twin = twin4;
+			twin4.twin = e4;
+			
+			e1.next = e3;
+			e1.prev = tempEdge.prev;
+			e3.next = tempEdge.prev;
+			e3.prev = e1;
+			tempEdge.prev.next = e1;
+			tempEdge.prev.prev = e3;
+			
+			temp1.triEdge1 = e1;
+			temp1.triEdge2 = e3;
+			temp1.triEdge3 = tempEdge.prev;
+			updateEdge(temp1);
+			
+			e2.next = tempEdge.next;
+			e2.prev = twin3;
+			tempEdge.next.next = twin3;
+			tempEdge.next.prev = e2;
+			twin3.next = e2;
+			twin3.prev = tempEdge.next;
+			
+			temp2.triEdge1 = e2;
+			temp2.triEdge2 = tempEdge.next;
+			temp2.triEdge3 = twin3;
+			updateEdge(temp2);
+			
+			twin1.next = tempEdge.twin.next;
+			twin1.prev = twin4;
+			tempEdge.twin.next.next = twin4;
+			tempEdge.twin.next.prev = twin1;
+			twin4.next = twin1;
+			twin4.prev = tempEdge.twin.next;
+			
+			temp3.triEdge1 = twin1;
+			temp3.triEdge2 = tempEdge.twin.next;
+			temp3.triEdge3 = twin4;
+			updateEdge(temp3);
+			
+			twin2.next = e4;
+			twin2.prev = tempEdge.twin.prev;
+			e4.next = tempEdge.twin.prev;
+			e4.prev = twin2;
+			tempEdge.twin.prev.next = twin2;
+			tempEdge.twin.prev.prev = e4;
+			
+			temp4.triEdge1 = twin2;
+			temp4.triEdge2 = e4;
+			temp4.triEdge3 = tempEdge.twin.prev;
+			updateEdge(temp4);
+			
+			temp1.child1 = temp1.child2 = temp1.child3 = null;
+			temp2.child1 = temp2.child2 = temp2.child3 = null;
+			
+			myTriangle.child1 = temp1;
+			myTriangle.child2 = temp2;
+			myTriangle.child3 = null;
+			
+			temp1.child1 = temp1.child2 = temp1.child3 = null;
+			temp2.child1 = temp2.child2 = temp2.child3 = null;
+			temp3.child1 = temp3.child2 = temp3.child3 = null;
+			temp4.child1 = temp4.child2 = temp4.child3 = null;
+			
+			temp.child1 = temp3;
+			temp.child2 = temp4;
+			temp.child3 = null;
+			
+			// flip edges that bounds these 4 triangles
+			legalizeEdge(myNode, tempEdge.prev);
+			legalizeEdge(myNode, tempEdge.next);
+			legalizeEdge(myNode, tempEdge.twin.next);
+			legalizeEdge(myNode, tempEdge.twin.prev);
 		}
 	}
 }
