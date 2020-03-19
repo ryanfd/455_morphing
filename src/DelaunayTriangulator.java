@@ -1,9 +1,15 @@
+import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.List;
+import java.util.Random;
+
+import org.opencv.core.KeyPoint;
+import org.opencv.core.MatOfKeyPoint;
 
 // coordinates on plane
 class vertex {
@@ -641,6 +647,63 @@ class tree {
 		a[p] = temp;
 		
 		return p;
+	}
+}
+
+public class DelaunayTriangulator extends tree {
+	
+	public DelaunayTriangulator(List<KeyPoint> listOfKeypoints1) {
+		int k, indexAfterRandom;
+		triangle temp = new triangle();
+		int pointNumber;
+		int maxNumberOfPoint = 100;
+		
+		try {
+			init1(); // open output file and store vertices
+			init(); // read coords of all points
+		} catch (Exception e) {
+			System.err.print("Something went wrong!");
+		}
+		
+		getStart(); // get intial triangle
+		
+		pointNumber = listOfKeypoints1.size();
+		
+		float[] randomNumber = new float[maxNumberOfPoint];
+		int[] randomIndex = new int[maxNumberOfPoint];
+		
+		Random value = new Random();
+		
+		for (int i=0; i<pointNumber; i++) {
+			randomNumber[i] = value.nextFloat();
+			randomIndex[i] = i;
+		}
+		
+		quicksort(randomNumber, randomIndex, 0, pointNumber-1);
+		
+		for (int i=0; i<pointNumber; i++) {
+			indexAfterRandom = randomIndex[i];
+			
+			temp = query(node[indexAfterRandom]); // location of point
+			
+			splitAndFlip(node[indexAfterRandom], temp); 
+		}
+		
+		getNumberOfTriangles(root);
+		
+		outputFile.println(triangleNumber1);
+		
+		try {
+			printLeaf(root);
+		} catch (Exception e) {
+			System.err.print("Something went wrong!");
+		}
+		
+		outputFile.close();
+		
+		for (int i=0; i<pointNumber; i++) {
+			screen.println(randomIndex[i]);
+		}
 	}
 }
 

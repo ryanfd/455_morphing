@@ -154,6 +154,8 @@ class FeatureDetection {
         System.out.println("# Inlier Ratio:                      \t" + inlierRatio);
         HighGui.imshow("result", res);
         HighGui.waitKey();
+        
+        DelaunayTriangulator dt = new DelaunayTriangulator(listOfKeypoints1);
     }
 }
         
