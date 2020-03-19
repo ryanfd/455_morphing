@@ -420,6 +420,228 @@ class tree {
 			legalizeEdge(myNode, tempEdge.twin.prev);
 		}
 	}
+	
+	// give point and find triangle
+	static triangle query(vertex myNode)
+	{
+		int d1,d2,d3;
+		
+		triangle temp = new triangle();
+		triangle temp4 = new triangle();
+		
+		// search tree until leaves found, find triangle from leaves
+		temp = root;
+		while (temp.child1 != null) {
+			temp4 = temp;
+			for (int i=1; i<=3; i++) {
+				if (i == 1 && temp4.child1 != null) temp = temp4.child1;
+				if (i == 2 && temp4.child2 != null) temp = temp4.child2;
+				if (i == 3 && temp4.child3 != null) temp = temp4.child3;
+				
+				// if point lies on left edge of triangle, triangle must contain point
+				d1 = criter(temp.triEdge1.origin.x, temp.triEdge1.origin.y, 
+						temp.triEdge1.destin.x, temp.triEdge1.destin.y, myNode.x, myNode.y);
+				
+				d2 = criter(temp.triEdge2.origin.x, temp.triEdge2.origin.y, 
+						temp.triEdge2.destin.x, temp.triEdge2.destin.y, myNode.x, myNode.y);
+				
+				d3 = criter(temp.triEdge3.origin.x, temp.triEdge3.origin.y, 
+						temp.triEdge3.destin.x, temp.triEdge3.destin.y, myNode.x, myNode.y);
+				
+				if (d1 <= 0 && d2 <= 0 && d3 <= 0) break;
+			}
+		}
+		
+		return temp;
+	}
+	
+	// recursively flip edge until you get legal edge
+	static void legalizeEdge(vertex p, edge e)
+	{
+		int cir;
+		
+		// reaches initial triangle's edge
+		if (e.twin == null) {
+			return;
+		} else {
+			// verify if edge is legal
+			cir = verifyCircle(e.origin, e.destin, p, e.twin.next.destin);
+			
+			screen.println(cir);
+			if (cir > 0) {
+				return; // edge is legal, recursion finished
+			} else {
+				triangle triangle1 = new triangle();
+				triangle triangle2 = new triangle();
+				triangle temp1 = new triangle();
+				triangle temp2 = new triangle();
+				
+				edge newEdge = new edge();
+				edge newTwin = new edge();
+				edge tempEdge1 = new edge();
+				edge tempEdge2 = new edge();
+				
+				temp1 = findTriangle(root, e); // find triangle incident to edge e
+				temp2 = findTriangle(root, e.twin); // same as above but for e.twin
+				
+				// update triangles created due to flipping
+				newEdge.origin = p;
+				newEdge.destin = e.twin.next.destin;
+				newTwin.origin = e.twin.next.destin;
+				newTwin.destin = p;
+				
+				newEdge.next = e.twin.prev;
+				newEdge.prev = e.next;
+				e.twin.prev.next = e.next;
+				e.twin.prev.prev = newEdge;
+				e.next.next = newEdge;
+				e.next.prev = e.twin.prev;
+				
+				newTwin.next = e.prev;
+				newTwin.prev = e.twin.next;
+				e.prev.next = e.twin.next;
+				e.prev.prev = newTwin;
+				e.twin.next.next = newTwin;
+				e.twin.next.prev = e.prev;
+				
+				newEdge.twin = newTwin;
+				newTwin.twin = newEdge;
+				
+				triangle1.triEdge1 = e.prev;
+				triangle1.triEdge2 = e.twin.next;
+				triangle1.triEdge3 = newTwin;
+				
+				tempEdge1 = triangle1.triEdge2;
+				
+				triangle2.triEdge1 = newEdge;
+				triangle2.triEdge2 = e.twin.prev;
+				triangle2.triEdge3 = e.next;
+				
+				tempEdge2 = triangle2.triEdge2;
+				/*
+				 * triangle1.triEdge3.twin = triangle2.triEdge1;
+				 * triangle2.triEdge1.twin = triangl1.triEdge3;
+				 */
+				
+				// set new triangles as children of flipped triangles
+				triangle1.child1 = triangle1.child2 = triangle1.child3 = null;
+				triangle2.child1 = triangle2.child2 = triangle2.child3 = null;
+				
+				temp1.child1 = triangle1;
+				temp1.child2 = triangle2;
+				temp1.child3 = null;
+				
+				temp2.child1 = triangle1;
+				temp2.child2 = triangle2;
+				temp2.child3 = null;
+				
+				legalizeEdge(p, tempEdge1);
+				legalizeEdge(p, tempEdge2);
+			}
+		}
+	}
+	
+	// decide if point lies on left egde
+	static int criter(int x1, int y1, int x2, int y2, int x3, int y3)
+	{
+		return x2*y3 + x1*y2 + x3*y1 - x2*y1 - x3*y2 - x1*y3;
+	}
+	
+	// update relationship between edges of triangle
+	static void updateEdge(triangle myTriangle)
+	{
+		myTriangle.triEdge1.next = myTriangle.triEdge2;
+		myTriangle.triEdge1.prev = myTriangle.triEdge3;
+		myTriangle.triEdge2.next = myTriangle.triEdge3;
+		myTriangle.triEdge2.prev = myTriangle.triEdge1;
+		myTriangle.triEdge3.next = myTriangle.triEdge1;
+		myTriangle.triEdge3.prev = myTriangle.triEdge2;
+	}
+	
+	// this next method hurts my soul
+	// calculate verification value and decide if edge is illegal
+	static int verifyCircle(vertex x, vertex y, vertex z, vertex t)
+	{
+		int x1,x2,y1,y2,z1,z2,t1,t2,cir;
+		
+		x1 = x.x; x2 = x.y;
+		y1 = y.x; y2 = y.y;
+		z1 = z.x; z2 = z.y;
+		t1 = t.x; t2 = t.y;
+		
+		cir = (x1*(y2*(z1*z1 + z2*z2)+t2*(y1*y1 + y2*y2)+z2*(t1*t1 + t2*t2)
+				-t2*(z1*z2 + z2*z2)-y2*(t1*t1 + t2*t2)-z2*(y1*y1 + y2*y2))) 
+				-
+				(x2*(y1*(z1*z1 + z2*z2)+t1*(y1*y1 + y2*y2)+z1*(t1*t1 + t2*t2)
+				-t1*(z1*z1 + z2*z2)-y1*(t1*t1 + t2*t2)-z1*(y1*y1 + y2*y2)))
+				+
+				((x1*x1 + x2*x2)*(y1*z2 + y2*t1 + t2*z1 - t1*z2 - t2*y1 - y2*z1))
+				-
+				(y1*z2*(t1*t1 + t2*t2) + y2*t1*(z1*z1 + z2*z2) + z1*t2*(y1*y1 + y2*y2)
+				- (y1*y1 + y2*y2)*z2*t1 - (z1*z1 + z2*z2)*t2*y1 - (t1*t1 + t2*t2)*y2*z1);
+		
+		return cir;
+	}
+	
+	// look for triangle with specified edge from triangulation
+	static triangle findTriangle(triangle myTriangle, edge myEdge)
+	{
+		triangle temp = new triangle();
+		triangle temp1 = new triangle();
+		temp = myTriangle;
+		
+		if (temp.triEdge1 == myEdge || temp.triEdge2 == myEdge || 
+			temp.triEdge3 == myEdge && (temp.child1 == null)) {
+			return temp;
+		} else {
+			temp1 = findTriangle(temp.child1, myEdge);
+			if (temp1 == null) {
+				temp1 = findTriangle(temp.child2, myEdge);
+				if (temp1 == null) {
+					temp1 = findTriangle(temp.child3, myEdge);
+				}
+			}
+			return temp1;
+		}
+	}
+	
+	// Quicksort
+	static void quicksort(float[] a, int[] b, int m, int n)
+	{
+		if (m < n) {
+			int p = partition(a, b, m, n);
+			quicksort(a, b, m, p-1);
+			quicksort(a, b, p+1, n);
+		}
+	}
+	
+	static int partition(float[] a, int[] b, int i, int j)
+	{
+		float pivot, temp;
+		int middle, p, ch;
+		
+		middle = (i+j)/2;
+		pivot = a[middle];
+		a[middle] = a[i];
+		a[i] = pivot;
+		p = i;
+		
+		for (int k=i+1; k<=j; k++) {
+			if (a[k] < pivot) {
+				temp = a[++p];
+				a[p] = a[k];
+				a[k] = temp;
+				ch = b[p];
+				b[p] = b[k]; // Boston Pizza = Burger King
+				b[k] = ch;
+			}
+		}
+		temp = a[i];
+		a[i] = a[p];
+		a[p] = temp;
+		
+		return p;
+	}
 }
 
 
