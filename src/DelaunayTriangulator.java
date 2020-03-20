@@ -66,7 +66,7 @@ class tree {
 	static triangle root; 
 	static edge e;
 	
-	// method provide to privide output file storing edges of triangulation
+	// method to provide output file storing edges of triangulation
 	static void init1() throws IOException 
 	{
 		file2 = new FileWriter("results1.txt");
@@ -76,7 +76,7 @@ class tree {
 	// read points and store in array of vertices
 	static void init() throws IOException 
 	{
-		FileReader file = new FileReader("t.txt");
+		FileReader file = new FileReader("t.txt"); // IOException is here			   // t.txt is not being found
 		BufferedReader inputFile = new BufferedReader(file);
 		
 		// read number of points
@@ -660,9 +660,15 @@ public class DelaunayTriangulator extends tree {
 		
 		try {
 			init1(); // open output file and store vertices
-			init(); // read coords of all points
-		} catch (Exception e) {
+		} catch (IOException e) {
 			System.err.print("Something went wrong!");
+		}
+		
+		// init not working
+		try {
+			init(); // read coords of all points
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		
 		getStart(); // get intial triangle
