@@ -1,5 +1,6 @@
 import java.awt.Point;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -74,13 +75,31 @@ class tree {
 	}
 	
 	// read points and store in array of vertices
-	static void init() throws IOException 
+	static void init(List<KeyPoint> points) throws IOException 
 	{
-		FileReader file = new FileReader("t.txt"); // IOException is here			   // t.txt is not being found
+		// write coords of points
+		FileWriter fw = new FileWriter("src/t.txt");
+		BufferedWriter bw = new BufferedWriter(fw);
+		
+		// write size
+		bw.write(new Integer(points.size()).toString());
+		bw.newLine();
+		
+		for (int i=0; i<points.size(); i++) {
+			System.out.println(points.get(i).pt.x);
+			bw.write(new Integer((int) points.get(i).pt.x).toString());
+			bw.newLine();
+			bw.write(new Integer((int) points.get(i).pt.y).toString());
+			if (i != points.size()-1) bw.newLine();
+			
+		}
+		bw.close();
+		FileReader file = new FileReader("src/t.txt"); 		   		   
 		BufferedReader inputFile = new BufferedReader(file);
 		
 		// read number of points
-		vertexNumber = new Integer(inputFile.readLine()).intValue();
+		vertexNumber = new Integer(inputFile.readLine()).intValue(); 
+		System.out.println("here");
 		node = new vertex[vertexNumber];
 		for (int i=0; i<vertexNumber; i++) {
 			node[i] = new vertex();
@@ -666,7 +685,7 @@ public class DelaunayTriangulator extends tree {
 		
 		// init not working
 		try {
-			init(); // read coords of all points
+			init(listOfKeypoints1); // read coords of all points
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
