@@ -98,6 +98,7 @@ class tree {
 		
 		// read number of points
 		vertexNumber = new Integer(inputFile.readLine()).intValue(); 
+		System.out.println("here");
 		node = new vertex[vertexNumber];
 		for (int i=0; i<vertexNumber; i++) {
 			node[i] = new vertex();
@@ -382,7 +383,7 @@ class tree {
 			temp1.triEdge1 = e1;
 			temp1.triEdge2 = e3;
 			temp1.triEdge3 = tempEdge.prev;
-			updateEdge(temp1);
+			updateEdge(temp1); // this call is problem, subsequent calls to updateEdge() work
 			
 			e2.next = tempEdge.next;
 			e2.prev = twin3;
@@ -577,6 +578,7 @@ class tree {
 		myTriangle.triEdge1.prev = myTriangle.triEdge3;
 		myTriangle.triEdge2.next = myTriangle.triEdge3;
 		myTriangle.triEdge2.prev = myTriangle.triEdge1;
+		// PROBLEM AREA: null pointer
 		myTriangle.triEdge3.next = myTriangle.triEdge1;
 		myTriangle.triEdge3.prev = myTriangle.triEdge2;
 	}
