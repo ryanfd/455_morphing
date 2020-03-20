@@ -98,7 +98,6 @@ class tree {
 		
 		// read number of points
 		vertexNumber = new Integer(inputFile.readLine()).intValue(); 
-		System.out.println("here");
 		node = new vertex[vertexNumber];
 		for (int i=0; i<vertexNumber; i++) {
 			node[i] = new vertex();
@@ -383,7 +382,7 @@ class tree {
 			temp1.triEdge1 = e1;
 			temp1.triEdge2 = e3;
 			temp1.triEdge3 = tempEdge.prev;
-			updateEdge(temp1); // this call is problem, subsequent calls to updateEdge() work
+			updateEdge(temp1); 
 			
 			e2.next = tempEdge.next;
 			e2.prev = twin3;
@@ -506,6 +505,7 @@ class tree {
 				edge tempEdge2 = new edge();
 				
 				temp1 = findTriangle(root, e); // find triangle incident to edge e
+											   // error
 				temp2 = findTriangle(root, e.twin); // same as above but for e.twin
 				
 				// update triangles created due to flipping
@@ -615,11 +615,11 @@ class tree {
 		triangle temp1 = new triangle();
 		temp = myTriangle;
 		
-		if (temp.triEdge1 == myEdge || temp.triEdge2 == myEdge || 
+		if (temp.triEdge1 == myEdge || temp.triEdge2 == myEdge || // error: null ptr
 			temp.triEdge3 == myEdge && (temp.child1 == null)) {
 			return temp;
 		} else {
-			temp1 = findTriangle(temp.child1, myEdge);
+			temp1 = findTriangle(temp.child1, myEdge); // error: null ptr
 			if (temp1 == null) {
 				temp1 = findTriangle(temp.child2, myEdge);
 				if (temp1 == null) {
