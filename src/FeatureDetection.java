@@ -1,8 +1,11 @@
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 
+import javax.swing.JFrame;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -154,7 +157,31 @@ class FeatureDetection {
         System.out.println("# Inlier Ratio:                      \t" + inlierRatio);
         HighGui.imshow("result", res);
         HighGui.waitKey();
-        DelaunayTriangulator dt = new DelaunayTriangulator(listOfInliers1);
+        
+        
+        // Delaunay Triangulation
+        double height=500;
+		double width=500;
+		ArrayList<DPoint> points=new ArrayList<DPoint>();
+
+		Random r = new Random();
+		for(int i=0; i<listOfMatched1.size(); i++) 
+		{
+			points.add(new DPoint( listOfMatched1.get(i).pt.x, listOfMatched1.get(i).pt.y
+//					,10000*r.nextDouble()
+					)); 
+		}
+		
+		BowyerWatson bw=new BowyerWatson(width,height,points);
+		DTriangle x=new DTriangle(new DPoint(0,0),new DPoint(100,0),new DPoint(10,10));
+		//System.out.println(bw.toString());
+	    JFrame window = new JFrame();
+	    window.setBounds(0, 0, 510, 525);
+	    //window.getContentPane().add(new Polygons(bw.getPolygons()));
+	    HashSet<DEdge> full_edges=bw.getPrunEdges();
+	    Kruskal k=new Kruskal(points,full_edges);
+	    window.getContentPane().add(new Lines(full_edges,k.getMST()));
+	    window.setVisible(true);
     }
 }
         
