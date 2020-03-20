@@ -86,7 +86,6 @@ class tree {
 		bw.newLine();
 		
 		for (int i=0; i<points.size(); i++) {
-			System.out.println(points.get(i).pt.x);
 			bw.write(new Integer((int) points.get(i).pt.x).toString());
 			bw.newLine();
 			bw.write(new Integer((int) points.get(i).pt.y).toString());
@@ -99,7 +98,6 @@ class tree {
 		
 		// read number of points
 		vertexNumber = new Integer(inputFile.readLine()).intValue(); 
-		System.out.println("here");
 		node = new vertex[vertexNumber];
 		for (int i=0; i<vertexNumber; i++) {
 			node[i] = new vertex();
