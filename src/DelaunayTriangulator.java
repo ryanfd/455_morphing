@@ -284,7 +284,7 @@ class tree {
 			
 			temp1.triEdge1 = e1;
 			temp1.triEdge2 = myTriangle.triEdge1;
-			temp.triEdge3 = twin2;
+			temp1.triEdge3 = twin2;
 			updateEdge(temp1);
 			
 			e2.next = myTriangle.triEdge2;
