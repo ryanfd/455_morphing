@@ -31,6 +31,9 @@ class FeatureDetection {
     	//load opencv
     	System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
     	
+    	ArrayList<DPolygon> polys=new ArrayList<DPolygon>();
+    	ArrayList<DPolygon> polys2=new ArrayList<DPolygon>();
+    	
     	//read images (to be replaced by user input)
     	Mat src1 = Imgcodecs.imread("dh_twice.jpg", Imgcodecs.IMREAD_GRAYSCALE);
     	Mat src2 = Imgcodecs.imread("mina_twice.jpg", Imgcodecs.IMREAD_GRAYSCALE);
@@ -153,27 +156,47 @@ class FeatureDetection {
         System.out.println("# Keypoints 1:                        \t" + listOfKeypoints1.size());
         System.out.println("# Keypoints 2:                        \t" + listOfKeypoints2.size());
         System.out.println("# Matches:                            \t" + listOfMatched1.size());
-        System.out.println("# Inliers:                            \t" + listOfInliers1.size());
+        System.out.println("# Inliers 1:                            \t" + listOfInliers1.size());
+        System.out.println("# Inliers 2:                            \t" + listOfInliers2.size());
         System.out.println("# Inlier Ratio:                      \t" + inlierRatio);
         HighGui.imshow("result", res);
         HighGui.waitKey();
         
-        
         // Delaunay Triangulation
-        double height=500;
-		double width=500;
+        double height=src1.height();
+		double width=src1.width();
 		ArrayList<DPoint> points=new ArrayList<DPoint>();
 
-		Random r = new Random();
-		for(int i=0; i<listOfMatched1.size(); i++) 
+		for(int i=0; i<listOfInliers1.size(); i++) 
 		{
-			points.add(new DPoint( listOfMatched1.get(i).pt.x, listOfMatched1.get(i).pt.y
+			points.add(new DPoint( listOfInliers1.get(i).pt.x, listOfInliers1.get(i).pt.y
+//					,10000*r.nextDouble()
+					)); 
+		}
+		
+		ArrayList<DPoint> points2=new ArrayList<DPoint>();
+
+		for(int i=0; i<listOfInliers2.size(); i++) 
+		{
+			points2.add(new DPoint( listOfInliers2.get(i).pt.x, listOfInliers2.get(i).pt.y
 //					,10000*r.nextDouble()
 					)); 
 		}
 		
 		BowyerWatson bw=new BowyerWatson(width,height,points);
-		DTriangle x=new DTriangle(new DPoint(0,0),new DPoint(100,0),new DPoint(10,10));
+//		BowyerWatson bw2=new BowyerWatson(width,height,points2);
+		
+		//set from before
+		polys = bw.getPolygons();
+//		polys2 = bw.getPolygons();
+		
+		for (DPolygon poly:polys) {
+			System.out.println("poly.1:" + poly.toString());
+			System.out.println("poly.2:" + poly.polygon.get(0).x);
+		}
+		
+		
+//		DTriangle x=new DTriangle(new DPoint(0,0),new DPoint(100,0),new DPoint(10,10));
 		//System.out.println(bw.toString());
 	    JFrame window = new JFrame();
 	    window.setBounds(0, 0, 510, 525);
