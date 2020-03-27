@@ -1,8 +1,4 @@
-/*File Exercise1.java
-
- IAT455 - Workshop week 7
-
- **********************************************************/
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Frame;
@@ -16,6 +12,7 @@ import java.awt.image.WritableRaster;
 import java.io.File;
 
 import javax.imageio.ImageIO;
+import javax.swing.JFrame;
 
 import org.opencv.core.Core;
 
@@ -37,6 +34,25 @@ class Morphing extends Frame {
 				}//end WindowAdapter
 				);//end addWindowListener
 	}// end constructor
+	
+	public Morphing(String title) 
+	{
+		super(title);
+		this.setSize(1000, 650);
+		
+		ControlPanel cPanel = new ControlPanel();
+		ImgPanel panel = new ImgPanel(this.getSize(), cPanel);
+		
+		this.add(panel);
+		
+		ImgPanel mainPanel = new ImgPanel(this.getSize(), cPanel);
+		setLayout(new BorderLayout());
+		add(mainPanel, BorderLayout.CENTER);
+		add(cPanel, BorderLayout.SOUTH);
+		
+		this.setVisible(true);
+		this.setResizable(false);
+	}
 	
 	// accessors
 	protected int getRed(int pixel) { return (pixel >>> 16) & 0xFF; }
@@ -77,9 +93,11 @@ class Morphing extends Frame {
 	{
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
         FeatureDetection fd = new FeatureDetection();
+        
+//        Morphing morph = new Morphing("GUI");
 	
 //		Morphing img = new Morphing();// instantiate this object
-//		img.repaint();// render the image
+//		morph.repaint();// render the image
 	
 	}// end main
 }
