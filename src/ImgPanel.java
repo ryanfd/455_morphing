@@ -26,7 +26,7 @@ public class ImgPanel extends JPanel implements ActionListener {
 	
 	public static boolean showControlPanel = true;
 	
-	public ImgPanel(Dimension initialSize, ControlPanel cp) 
+	public ImgPanel(Dimension initialSize, ControlPanel cp)  
 	{
 		super();
 		cPanel = cp;
