@@ -23,12 +23,13 @@ public class ControlPanel extends JPanel {
 		add(bottom, BorderLayout.SOUTH);
 		add(top, BorderLayout.NORTH);
 		
-		center = new Container();
-		center.setLayout(new FlowLayout(FlowLayout.LEFT, 12, 10));
-		center.add(img1);
-		center.add(img2);
-		center.add(img3);
-		center.add(morphButton);
+//		center = new Container();
+//		center.setLayout(new FlowLayout(FlowLayout.LEFT, 12, 10));
+//		center.add(img1);
+//		center.add(img2);
+//		center.add(img3);
+//		center.add(morphButton);
+		
 	}
 
 	private void setComponentsAttributes() {
@@ -64,11 +65,21 @@ public class ControlPanel extends JPanel {
 			}
 		});
 		
+		morphButton = new JButton("Morph");
+		morphButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				ImgPanel.doMorph = true;
+			}
+		});
+		
 		top = new Container();
 		top.setLayout(new FlowLayout(FlowLayout.LEFT));
 		top.add(img1);
 		top.add(img2);
 		top.add(img3);
+		bottom.add(morphButton);
 	}
 	
 	public void update(ImgPanel p) {

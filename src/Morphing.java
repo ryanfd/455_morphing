@@ -16,8 +16,7 @@ import javax.swing.JFrame;
 
 import org.opencv.core.Core;
 
-class Morphing extends Frame { 
-
+class Morphing extends JFrame {
 	public Morphing() {
 		// constructor
 		// Get an image from the specified file in the current directory on the
@@ -38,6 +37,7 @@ class Morphing extends Frame {
 	public Morphing(String title) 
 	{
 		super(title);
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setSize(1000, 650);
 		
 		ControlPanel cPanel = new ControlPanel();
@@ -92,9 +92,9 @@ class Morphing extends Frame {
 	public static void main(String[] args) 
 	{
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-        FeatureDetection fd = new FeatureDetection();
+//        FeatureDetection fd = new FeatureDetection();
         
-//        Morphing morph = new Morphing("GUI");
+        Morphing morph = new Morphing("GUI");
 	
 //		Morphing img = new Morphing();// instantiate this object
 //		morph.repaint();// render the image

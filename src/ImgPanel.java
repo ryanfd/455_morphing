@@ -1,4 +1,5 @@
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -11,6 +12,7 @@ public class ImgPanel extends JPanel implements ActionListener {
 
 	public static String selectedImg;
 	public BufferedImage morphTo, img1, img2, img3;
+	public static boolean doMorph;
 	
 	private static ControlPanel cPanel;
 	
@@ -21,11 +23,13 @@ public class ImgPanel extends JPanel implements ActionListener {
 		super();
 		cPanel = cp;
 		selectedImg = "Img1";
-		
-//		addMouseListener(new MyMouseAdapter());
-//		addMouseMotionListener(new MyMouseMotionAdapter());
-//		addKeyListener(new MyKeyAdapter());
+		doMorph = false;
+
 		setFocusable(true);
+	}
+	
+	public void paintComponenet(Graphics g) {
+		cPanel.update(this);
 	}
 
 	@Override
@@ -39,14 +43,13 @@ public class ImgPanel extends JPanel implements ActionListener {
 		
 		if (selectedImg == "Img3")
 			morphTo = img3;
+		
+		if (doMorph) {
+			System.out.println("DO DA MORPHINE");
+			doMorph = false;
+		}
 	}
 }
-
-//private class MyMouseMotionAdapter extends MouseMotionAdapter {
-//	public void mouseMoved(MouseEvent e) {
-//		
-//	}
-//}
 
 
 
