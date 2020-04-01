@@ -32,13 +32,28 @@ class Morphing extends JFrame {
 					}//end windowClosing()
 				}//end WindowAdapter
 				);//end addWindowListener
+		
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setSize(1500, 1000);
+		
+		ControlPanel cPanel = new ControlPanel();
+		ImgPanel panel = new ImgPanel(this.getSize(), cPanel);
+		this.add(panel);
+		
+		ImgPanel mainPanel = new ImgPanel(this.getSize(), cPanel);
+		setLayout(new BorderLayout());
+		add(mainPanel, BorderLayout.CENTER);
+		add(cPanel, BorderLayout.SOUTH);
+		
+		this.setVisible(true);
+		this.setResizable(false);
 	}// end constructor
 	
 	public Morphing(String title) 
 	{
 		super(title);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setSize(1000, 650);
+		this.setSize(2000, 1000);
 		
 		ControlPanel cPanel = new ControlPanel();
 		ImgPanel panel = new ImgPanel(this.getSize(), cPanel);
@@ -94,10 +109,10 @@ class Morphing extends JFrame {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 //        FeatureDetection fd = new FeatureDetection();
         
-        Morphing morph = new Morphing("GUI");
+//        Morphing morph = new Morphing("GUI");
 	
-//		Morphing img = new Morphing();// instantiate this object
-//		morph.repaint();// render the image
+		Morphing img = new Morphing();// instantiate this object
+//		img.repaint();// render the image
 	
 	}// end main
 }
