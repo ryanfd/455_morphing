@@ -85,7 +85,6 @@ public class ControlPanel extends JPanel {
 		img1.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ImgPanel.canUpdate = true;
 				ImgPanel.img1Bool = true;
 				ImgPanel.img2Bool = false;
 				ImgPanel.img3Bool = false;
@@ -99,7 +98,6 @@ public class ControlPanel extends JPanel {
 		img2.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ImgPanel.canUpdate = true;
 				ImgPanel.img2Bool = true;
 				ImgPanel.img1Bool = false;
 				ImgPanel.img3Bool = false;
@@ -113,7 +111,6 @@ public class ControlPanel extends JPanel {
 		img3.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ImgPanel.canUpdate = true;
 				ImgPanel.img3Bool = true;
 				ImgPanel.img2Bool = false;
 				ImgPanel.img1Bool = false;
@@ -126,7 +123,6 @@ public class ControlPanel extends JPanel {
 		morphButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ImgPanel.canUpdate = true;
 				ImgPanel.doMorph = true;
 			}
 		});

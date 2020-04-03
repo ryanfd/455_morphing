@@ -37,7 +37,6 @@ public class ImgPanel extends JPanel implements ActionListener {
 	public static BufferedImage morphTo, img1, img2, img3;
 	public static boolean doMorph;
 	public static boolean img1Bool, img2Bool, img3Bool;
-	public static boolean canUpdate = true;
 
 	private JLabel displayImg;
 	private static ControlPanel cPanel;
