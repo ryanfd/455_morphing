@@ -2,6 +2,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridBagLayout;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -11,9 +13,14 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -29,7 +36,8 @@ public class ImgPanel extends JPanel implements ActionListener {
 	public static BufferedImage morphTo, img1, img2, img3;
 	public static boolean doMorph;
 	public static boolean img1Bool, img2Bool, img3Bool;
-
+	
+	private JLabel displayImg;
 	private static ControlPanel cPanel;
 
 	private static String status = "Status";
@@ -59,16 +67,12 @@ public class ImgPanel extends JPanel implements ActionListener {
 			System.out.println("Can't load image");
 		}
 		
-
-		int randomSpeedx = (int) (Math.random()*14 - 7);
-		if (randomSpeedx == 0) randomSpeedx = 7;
-
-		int randomSpeedy = (int) (Math.random()*14 - 7);
-		if (randomSpeedy == 0) randomSpeedx = 7;
-
+		BufferedImage displayBuff = getScaledImage(morphTo, (int) (morphTo.getWidth()/2.2), (int) (this.getHeight()/4.3));
+		ImageIcon displayIcon = new ImageIcon(displayBuff);
+		displayImg = new JLabel(displayIcon);
 		
 		// DO NOT TOUCH THE TIMER
-		// don't know why this timer is necessary, but it is
+		// timer allows for updated frames: 30 FPS
 		t = new Timer(33, this);
 		t.start();
 
@@ -81,7 +85,10 @@ public class ImgPanel extends JPanel implements ActionListener {
 		h = (int) (morphTo.getHeight()/2);
 		x = (this.getWidth() - morphTo.getWidth(null));
 		this.setSize(w*5+100,h*4+50);
-		g.drawImage(morphTo, x,0,w,h,this);
+//		g.drawImage(morphTo, x,0,w,h,this);
+		this.setLayout(new GridBagLayout());
+		this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		this.add(displayImg);
 		cPanel.update(this);
 	}
 
@@ -114,12 +121,16 @@ public class ImgPanel extends JPanel implements ActionListener {
 		if (doMorph) { //boolean for initiating panic mode of highlighted animal
 			System.out.println("Morphing Time");
 			if (selectedImg != prevImg) {
-				System.out.println("test");
-				try {
-					morphTo = ImageIO.read(new File(imgAddress));
-				} catch (Exception e1) {
-					System.out.println("Can't load image");
+				BufferedImage newImg = null;
+				if (selectedImg == "Image 1") {
+					newImg = getScaledImage(img1, (int) (morphTo.getWidth()/2.2), (int) (this.getHeight()/4.3));
+				} else if (selectedImg == "Image 2") {
+					newImg = getScaledImage(img2, (int) (morphTo.getWidth()/2.2), (int) (this.getHeight()/4.3));
+				} else if (selectedImg == "Image 3") {
+					newImg = getScaledImage(img3, (int) (morphTo.getWidth()/2.2), (int) (this.getHeight()/4.3));
 				}
+				ImageIcon result = new ImageIcon(newImg);
+				displayImg.setIcon(result);
 			}
 			doMorph = false;
 			prevImg = selectedImg;
@@ -134,6 +145,18 @@ public class ImgPanel extends JPanel implements ActionListener {
 
 	public String getStatus() {
 		return status;
+	}
+	
+	private BufferedImage getScaledImage(BufferedImage srcImg, int w, int h)
+	{
+		BufferedImage resizedImg = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g2 = resizedImg.createGraphics();
+
+		g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+		g2.drawImage(srcImg, 0, 0, w, h, null);
+		g2.dispose();
+
+		return resizedImg;
 	}
 }
 
