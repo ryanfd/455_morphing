@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -17,12 +18,16 @@ import org.opencv.core.KeyPoint;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfDMatch;
 import org.opencv.core.MatOfKeyPoint;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.features2d.AKAZE;
 import org.opencv.features2d.DescriptorMatcher;
 import org.opencv.features2d.Features2d;
 import org.opencv.highgui.HighGui;
 import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -33,10 +38,11 @@ class FeatureDetection {
     	
     	ArrayList<DPolygon> polys=new ArrayList<DPolygon>();
     	ArrayList<DPolygon> polys2=new ArrayList<DPolygon>();
+    	ArrayList<DPolygon> destPolys=new ArrayList<DPolygon>();
     	
     	//read images (to be replaced by user input)
-    	Mat src1 = Imgcodecs.imread("dh_twice.jpg", Imgcodecs.IMREAD_GRAYSCALE);
-    	Mat src2 = Imgcodecs.imread("mina_twice.jpg", Imgcodecs.IMREAD_GRAYSCALE);
+    	Mat src1 = Imgcodecs.imread("smallDahyun.jpg", Imgcodecs.IMREAD_GRAYSCALE);
+    	Mat src2 = Imgcodecs.imread("jy_head.jpg", Imgcodecs.IMREAD_GRAYSCALE);
     	
     	if (src1.empty() || src2.empty()) {
     		System.err.print("Can't read image");
@@ -184,15 +190,88 @@ class FeatureDetection {
 		}
 		
 		BowyerWatson bw=new BowyerWatson(width,height,points);
-//		BowyerWatson bw2=new BowyerWatson(width,height,points2);
+		BowyerWatson bw2=new BowyerWatson(src2.width(),src2.height(),points2);
 		
 		//set from before
 		polys = bw.getPolygons();
-//		polys2 = bw.getPolygons();
+		polys2 = bw2.getPolygons();
+//		System.out.println(bw.triangles.size());
 		
+		//get in between target points for both images
+		int destI = 0;
+		DPolygon toAdd = null;
 		for (DPolygon poly:polys) {
-			System.out.println("poly.1:" + poly.toString());
-			System.out.println("poly.2:" + poly.polygon.get(0).x);
+			ArrayList<DPoint> pts = new ArrayList<DPoint>();
+			DPoint a, b, c;
+			
+			a = poly.polygon.get(0).getMean(polys2.get(destI).polygon.get(0));
+			b = poly.polygon.get(1).getMean(polys2.get(destI).polygon.get(1));
+			c = poly.polygon.get(2).getMean(polys2.get(destI).polygon.get(2));
+			
+			pts.add(a);
+			pts.add(b);
+			pts.add(c);
+			
+			toAdd = new DPolygon(pts);
+			
+			destPolys.add(toAdd);
+			++destI;
+		}
+		//now we have the midpoint by finding average of triangles
+		
+		
+		//for each triangle in first source\
+		destI = 0;
+		for (DPolygon poly:polys) {
+			System.out.println(destI);
+			//pick corresponding triangle in destination morph
+			Point[] srcTri = new Point[3];
+	        srcTri[0] = new Point( poly.polygon.get(0).x, poly.polygon.get(0).y );
+	        srcTri[1] = new Point( poly.polygon.get(1).x, poly.polygon.get(1).y );
+	        srcTri[2] = new Point( poly.polygon.get(2).x, poly.polygon.get(2).y );
+	        
+	        Point[] dstTri = new Point[3];
+	        dstTri[0] = new Point( destPolys.get(destI).polygon.get(0).x, destPolys.get(destI).polygon.get(0).y );
+	        dstTri[1] = new Point( destPolys.get(destI).polygon.get(1).x, destPolys.get(destI).polygon.get(1).y );
+	        dstTri[2] = new Point( destPolys.get(destI).polygon.get(2).x, destPolys.get(destI).polygon.get(2).y );
+
+			//get affine transform of trangle
+			Mat warpMat = Imgproc.getAffineTransform( new MatOfPoint2f(srcTri), new MatOfPoint2f(dstTri) );
+			
+			//use warpmat to transform all pixels inside the triangle into the warped image (aka for each pixel inside triangle, set into warp)
+			Mat warpDst = Mat.zeros( src1.rows(), src1.cols(), src1.type() );
+	        Imgproc.warpAffine( src1, warpDst, warpMat, warpDst.size() );
+	        
+	        //need "DPoints" instead of regular points to calculate center
+	        DTriangle centerCalc = new DTriangle( destPolys.get(destI).polygon.get(0), 
+	        		destPolys.get(destI).polygon.get(1), 
+	        		destPolys.get(destI).polygon.get(2)
+	        		);
+	        double centerX = centerCalc.center.x, centerY = centerCalc.center.y;
+	        
+	        //create triangle mask for poly
+	        Mat mask = Mat.zeros(src1.rows(), src1.cols(), src1.type() );
+	        Imgproc.fillConvexPoly(mask, new MatOfPoint(dstTri), new Scalar(255), 8, 0);
+	        
+	        //for each pixel
+	        
+//	        		
+//	        Point center = new Point(centerX, centerY);
+//	        double angle = 0;
+//	        double scale = 1;
+//	        Mat rotMat = Imgproc.getRotationMatrix2D( center, angle, scale );
+//	        Mat warpRotateDst = new Mat();
+//	        Imgproc.warpAffine( warpDst, warpRotateDst, rotMat, warpDst.size() );
+	        HighGui.imshow( "Source image", mask );
+	        HighGui.imshow( "Warp", warpDst );
+	        HighGui.waitKey(0);
+
+			++destI;
+		}
+		
+		//repeat for second image
+		for (DPolygon poly:polys2) {
+			
 		}
 		
 		

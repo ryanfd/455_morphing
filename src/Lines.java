@@ -25,14 +25,14 @@ public class Lines extends JComponent{
 	public void paint(Graphics g) {
 		Graphics2D g2 = (Graphics2D) g;
 		g2.setBackground(Color.white);
-//		float dash[] = { 10.0f };
-//		g2.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_BUTT,
-//		        BasicStroke.JOIN_MITER, 10.0f, dash, 0.0f));
-//		g2.setColor(Color.gray);
-//		for(DEdge line:full_edges){
-//			Shape k = new Line2D.Double(line.p[0].x,line.p[0].y, line.p[1].x,line.p[1].y);
-//			g2.draw(k);
-//		}
+		float dash[] = { 10.0f };
+		g2.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_BUTT,
+		        BasicStroke.JOIN_MITER, 10.0f, dash, 0.0f));
+		g2.setColor(Color.gray);
+		for(DEdge line:full_edges){
+			Shape k = new Line2D.Double(line.p[0].x,line.p[0].y, line.p[1].x,line.p[1].y);
+			g2.draw(k);
+		}
 		g2.setColor(Color.BLACK);
 		g2.setStroke(new BasicStroke((float) 1.5));
 		for(DEdge line:mst_edges){

@@ -1,4 +1,3 @@
-
 // points to triangulate
 public class DPoint {
 
@@ -17,5 +16,15 @@ public class DPoint {
 	
 	public String toString(){
 		return "("+x+","+y+") ";
+	}
+	
+	public DPoint plus(DPoint dest) {
+		DPoint result = new DPoint(x + dest.x, y + dest.y);
+		return result;
+	}
+	
+	public DPoint getMean(DPoint dest) {
+		DPoint result = new DPoint((x + dest.x)/2, (y + dest.y)/2);
+		return result;
 	}
 }
