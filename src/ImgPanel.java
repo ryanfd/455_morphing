@@ -100,34 +100,30 @@ public class ImgPanel extends JPanel implements ActionListener {
 		if (img1Bool) {
 			selectedImg = "Image 1";
 			imgAddress = "mina_twice.jpg";
-			System.out.println(selectedImg);
 			img1Bool = false;
 		}
 		
 		else if (img2Bool) {
 			selectedImg = "Image 2";
 			imgAddress = "jy_twice.jpg";
-			System.out.println(selectedImg);
 			img2Bool = false;
 		}
 		
 		else if (img3Bool) {
 			selectedImg = "Image 3";
 			imgAddress = "sana_twice.jpg";
-			System.out.println(selectedImg);
 			img3Bool = false;
 		}
 		
-		if (doMorph) { //boolean for initiating panic mode of highlighted animal
-			System.out.println("Morphing Time");
+		if (doMorph) { //boolean for initiating morph
 			if (selectedImg != prevImg) {
 				BufferedImage newImg = null;
 				if (selectedImg == "Image 1") {
-					newImg = getScaledImage(img1, (int) (morphTo.getWidth()/2.2), (int) (this.getHeight()/4.3));
+					newImg = getScaledImage(img1, (int) (img1.getWidth()/2.2), (int) (this.getHeight()/4.3));
 				} else if (selectedImg == "Image 2") {
-					newImg = getScaledImage(img2, (int) (morphTo.getWidth()/2.2), (int) (this.getHeight()/4.3));
+					newImg = getScaledImage(img2, (int) (img2.getWidth()/2.2), (int) (this.getHeight()/4.3));
 				} else if (selectedImg == "Image 3") {
-					newImg = getScaledImage(img3, (int) (morphTo.getWidth()/2.2), (int) (this.getHeight()/4.3));
+					newImg = getScaledImage(img3, (int) (img3.getWidth()/2.2), (int) (this.getHeight()/4.3));
 				}
 				ImageIcon result = new ImageIcon(newImg);
 				displayImg.setIcon(result);
@@ -159,155 +155,3 @@ public class ImgPanel extends JPanel implements ActionListener {
 		return resizedImg;
 	}
 }
-
-	
-
-
-
-//import java.awt.Color;
-//import java.awt.Dimension;
-//import java.awt.Graphics;
-//import java.awt.Graphics2D;
-//import java.awt.event.ActionEvent;
-//import java.awt.event.ActionListener;
-//import java.awt.image.BufferedImage;
-//import java.io.File;
-//
-//import javax.imageio.ImageIO;
-//import javax.swing.JPanel;
-//
-//import org.opencv.core.Mat;
-//import org.opencv.imgcodecs.Imgcodecs;
-//
-//public class ImgPanel extends JPanel implements ActionListener {
-//
-//	public String selectedImg = "Image 1";
-//	public static BufferedImage morphTo, img1, img2, img3;
-//	public static boolean doMorph;
-//	public static boolean img1Bool, img2Bool, img3Bool;
-//	
-//	private static ControlPanel cPanel;
-//	
-//	public static boolean showControlPanel = true;
-//	
-//	public ImgPanel(Dimension initialSize, ControlPanel cp)  
-//	{
-//		super();
-//		cPanel = cp;
-////		selectedImg = "Image 1";
-//		doMorph = false;
-//		img1Bool = true;
-//		img2Bool = false;
-//		img3Bool = false;
-//		
-//		try {
-//			img1 = ImageIO.read(new File("mina_twice.jpg"));
-//			img2 = ImageIO.read(new File("jy_twice.jpg"));
-//			img3 = ImageIO.read(new File("sana_twice.jpg"));
-//			morphTo = ImageIO.read(new File("mina_twice.jpg"));
-//		} catch (Exception e) {
-//			System.out.println("Can't load image");
-//		}
-//
-//		setFocusable(true);
-//	}
-//	
-//	
-//	public void paintComponent(Graphics g) {
-//		int w = (int) (morphTo.getWidth()/2);
-//		int h = (int) (morphTo.getHeight()/2);
-//		int x = (this.getWidth() - morphTo.getWidth(null));
-//		
-//		this.setSize(w*5+100,h*4+50);
-//		
-//		setBackground(new Color(50,50,50));
-//		
-//		if (selectedImg == "Image 1") {
-//			try {
-//				morphTo = ImageIO.read(new File("mina_twice.jpg"));
-//			} catch (Exception e1) {
-//				System.out.println("Can't load image");
-//			}
-//		}
-//		
-//		if (selectedImg == "Image 2") {
-//			try {
-//				morphTo = ImageIO.read(new File("jy_twice.jpg"));
-//			} catch (Exception e1) {
-//				System.out.println("Can't load image");
-//			}
-//		}
-//		
-//		if (selectedImg == "Image 3") {
-//			try {
-//				morphTo = ImageIO.read(new File("sana_twice.jpg"));
-//			} catch (Exception e1) {
-//				System.out.println("Can't load image");
-//			}
-//		}
-//		
-//		g.drawImage(morphTo, x,0,w,h,this);
-//		System.out.println("again");
-//		
-//		
-//		
-//		cPanel.update(this);
-//	}
-//
-//
-//	@Override
-//	public void actionPerformed(ActionEvent e) {
-//		// TODO Auto-generated method stub
-//		String ch = e.getActionCommand();
-//		
-//		System.out.println("SYSTEM CHECK");
-//		if (img1Bool) {
-//			selectedImg = "Image 1";
-//			img2Bool = false;
-//			img3Bool = false;
-//		}
-//		
-//		if (img2Bool) {
-//			selectedImg = "Image 2";
-//			img1Bool = false;
-//			img3Bool = false;
-//		}
-//		
-//		if (img3Bool) {
-//			selectedImg = "Image 3";
-//			img2Bool = false;
-//			img1Bool = false;
-//		}
-//		
-//		if (doMorph) {
-//			System.out.println("DO DA MORPHY MORPHY"); // do morphing
-//			doMorph = false;
-//		}
-//		
-//		
-//		repaint();
-//		
-//	}
-//	
-//}
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
