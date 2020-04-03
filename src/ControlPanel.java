@@ -25,7 +25,7 @@ public class ControlPanel extends JPanel {
 	private JButton img1, img2, img3;
 	private JButton morphButton;
 	private JLabel label;
-	private JTextField field;
+	private JTextField field, field2, field3;
 	private Container center;
 	private String currentImg;
 
@@ -42,10 +42,18 @@ public class ControlPanel extends JPanel {
 		field = new JTextField(5);
 		field.setFocusable(false);
 		field.setHorizontalAlignment(SwingConstants.CENTER);
+		field2 = new JTextField(5);
+		field2.setFocusable(false);
+		field2.setHorizontalAlignment(SwingConstants.CENTER);
+		field3 = new JTextField(5);
+		field3.setFocusable(false);
+		field3.setHorizontalAlignment(SwingConstants.CENTER);
 		center = new Container();
 		center.setLayout(new FlowLayout(FlowLayout.LEFT, 12, 10));
 		center.add(label);
 		center.add(field);
+		center.add(field2);
+		center.add(field3);
 	
 		add(center, BorderLayout.CENTER);
 	}
@@ -77,6 +85,7 @@ public class ControlPanel extends JPanel {
 		img1.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				ImgPanel.canUpdate = true;
 				ImgPanel.img1Bool = true;
 				ImgPanel.img2Bool = false;
 				ImgPanel.img3Bool = false;
@@ -90,6 +99,7 @@ public class ControlPanel extends JPanel {
 		img2.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				ImgPanel.canUpdate = true;
 				ImgPanel.img2Bool = true;
 				ImgPanel.img1Bool = false;
 				ImgPanel.img3Bool = false;
@@ -103,6 +113,7 @@ public class ControlPanel extends JPanel {
 		img3.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				ImgPanel.canUpdate = true;
 				ImgPanel.img3Bool = true;
 				ImgPanel.img2Bool = false;
 				ImgPanel.img1Bool = false;
@@ -115,6 +126,7 @@ public class ControlPanel extends JPanel {
 		morphButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				ImgPanel.canUpdate = true;
 				ImgPanel.doMorph = true;
 			}
 		});
@@ -134,7 +146,14 @@ public class ControlPanel extends JPanel {
 		if (ImgPanel.showControlPanel) this.setVisible(true);
 		else this.setVisible(false);
 		
-		field.setText(currentImg); //show current selected img to morph to
+			if (currentImg == "Image 1") field.setText("Image 1"); //show current selected img to morph to
+			else field.setText("");
+			
+			if (currentImg == "Image 2") field2.setText("Image 2");
+			else field2.setText("");
+			
+			if (currentImg == "Image 3") field3.setText("Image 3");
+			else field3.setText("");
 	}
 	
 	private BufferedImage getScaledImage(BufferedImage srcImg, int w, int h)
