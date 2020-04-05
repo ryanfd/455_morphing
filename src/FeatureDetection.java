@@ -318,7 +318,8 @@ class FeatureDetection {
         }
         
         // Get mask by filling triangle
-        Mat mask = new Mat();
+//        Mat mask = new Mat();
+        Mat mask = new Mat(new Size(img1.width(), img1.height()), CvType.CV_64FC1);
 //        fillConvexPoly(mask, tRectInt, Scalar(1.0, 1.0, 1.0), 16, 0);
         MatOfPoint moo = new MatOfPoint();
         moo.fromList(tRectInt);
@@ -369,12 +370,12 @@ class FeatureDetection {
         Imgproc.resize(warpImage2, resized_warpImage2, size);
         Core.addWeighted((Mat)warpImage1, alpha, (Mat)resized_warpImage2, beta, 0.0, imgRect);
         
-        System.out.println("Mask Width: " + mask.width());
-        System.out.println("Mask Width: " + mask.height());
         Mat resized_mask = new Mat();
         Size maskSize = new Size(imgRect.width(), imgRect.height());
-        System.out.println("RESIZED Mask Size: " + maskSize);
+        System.out.println("MASK SIZE: " + new Size(mask.width(), mask.height()));
         Imgproc.resize(mask, resized_mask, maskSize);
+        System.out.println("IMGRECT SIZE: " + new Size(imgRect.width(), imgRect.height()));
+        System.out.println("RESIZED_MASK SIZE: " + new Size(resized_mask.width(), resized_mask.height()));
         
         
         //1
