@@ -151,6 +151,8 @@ class FeatureDetection {
                     Math.pow(colData[1] - listOfMatched2.get(i).pt.y, 2));
     		
 //    		System.out.println(dist);
+    		System.out.println("dist: " + dist);
+    		System.out.println("inlier: " + inlierThreshold);
     		if (dist < inlierThreshold) {
     			listOfGoodMatches.add(new DMatch(listOfInliers1.size(), listOfInliers2.size(), 0));
     			listOfInliers1.add(listOfMatched1.get(i));
@@ -283,7 +285,7 @@ class FeatureDetection {
 	    HashSet<DEdge> full_edges=bw.getPrunEdges();
 	    Kruskal k=new Kruskal(points,full_edges);
 	    window.getContentPane().add(new Lines(full_edges,k.getMST()));
-//	    window.setVisible(true);
+	    window.setVisible(true);
 	    System.out.println("Morph Complete");
     }
     
