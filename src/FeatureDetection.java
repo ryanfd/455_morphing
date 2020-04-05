@@ -24,6 +24,7 @@ import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.features2d.AKAZE;
 import org.opencv.features2d.DescriptorMatcher;
 import org.opencv.features2d.Features2d;
@@ -361,16 +362,23 @@ class FeatureDetection {
 //        Mat imgRect = (1.0 - alpha) * warpImage1 + alpha * warpImage2;
         Mat imgRect = new Mat(img1.height(), img1.width(), img1.type());
         double beta = ( 1.0 - alpha );
-        Core.addWeighted( warpImage1, alpha, warpImage2, beta, 0.0, imgRect);
         
-        // Copy triangular region of the rectangular patch to the output image
-     // Copy triangular region of the rectangular patch to the output image
-//        multiply(imgRect,mask, imgRect);
-//        multiply(img(r), Scalar(1.0,1.0,1.0) - mask, img(r));
-//        img(r) = img(r) + imgRect;
+        // mats must be same size for Core operations
+        Mat resized_warpImage2 = new Mat();
+        Size size = new Size(warpImage1.width(), warpImage1.height());
+        Imgproc.resize(warpImage2, resized_warpImage2, size);
+        Core.addWeighted((Mat)warpImage1, alpha, (Mat)resized_warpImage2, beta, 0.0, imgRect);
+        
+        System.out.println("Mask Width: " + mask.width());
+        System.out.println("Mask Width: " + mask.height());
+        Mat resized_mask = new Mat();
+        Size maskSize = new Size(imgRect.width(), imgRect.height());
+        System.out.println("RESIZED Mask Size: " + maskSize);
+        Imgproc.resize(mask, resized_mask, maskSize);
+        
         
         //1
-        Core.multiply(imgRect, mask, imgRect);
+        Core.multiply(imgRect, resized_mask, imgRect);
 //        resultROI.copyTo(result);
         
         //2
