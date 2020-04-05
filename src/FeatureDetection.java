@@ -128,7 +128,7 @@ class FeatureDetection {
     	}
     	
     	/* check if our matches fit in homography model*/
-    	double inlierThreshold = 100; 
+    	double inlierThreshold = 150; 
     	List<KeyPoint> listOfInliers1 = new ArrayList<>();
     	List<KeyPoint> listOfInliers2 = new ArrayList<>();
     	List<DMatch> listOfGoodMatches = new ArrayList<>();
@@ -405,15 +405,16 @@ class FeatureDetection {
 //        System.out.println("MASK CHANNELS: " + mask.channels());
 //        System.out.println("-------------------");
         
+        System.out.println("R DIMENSIONS: " + r.size());
         r.height = result.height();
         r.width = result.width();
-//        System.out.println("RESULT DIMENSIONS: " + result.size());
-//        System.out.println("RESULT TYPE: " + result.type());
+        System.out.println("RESULT DIMENSIONS: " + result.size());
+        System.out.println("RESULT TYPE: " + result.type());
         temp.convertTo(temp, result.type());
-//        System.out.println("TEMP DIMENSIONS: " + temp.size());
-//        System.out.println("TEMP TYPE: " + temp.type());
-//        System.out.println("R DIMENSIONS: " + r.size());
-//        System.out.println("-------------------");
+        System.out.println("TEMP DIMENSIONS: " + temp.size());
+        System.out.println("TEMP TYPE: " + temp.type());
+        System.out.println("R DIMENSIONS: " + r.size());
+        System.out.println("-------------------");
         Core.multiply(result.submat(r), temp, result.submat(r));
 //        result.submat(r).copyTo(result);
         
