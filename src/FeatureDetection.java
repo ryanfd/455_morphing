@@ -51,7 +51,7 @@ class FeatureDetection {
     	Mat src2 = new Mat(1000, 1000, srcIn2.type());
     	srcIn1.copyTo(src1);
     	srcIn2.copyTo(src2);
-    	Mat result = new Mat();
+    	Mat result = new Mat(srcIn1.height(), srcIn1.width(), srcIn1.type());
     	
     	if (src1.empty() || src2.empty()) {
     		System.err.print("Can't read image");
@@ -319,7 +319,7 @@ class FeatureDetection {
         
         // Get mask by filling triangle
 //        Mat mask = new Mat();
-        Mat mask = new Mat(new Size(img1.width(), img1.height()), img1.type());
+        Mat mask = new Mat(new Size(img1.height(), img1.width()), img1.type());
 //        fillConvexPoly(mask, tRectInt, Scalar(1.0, 1.0, 1.0), 16, 0);
         MatOfPoint moo = new MatOfPoint();
         moo.fromList(tRectInt);
@@ -376,8 +376,10 @@ class FeatureDetection {
         
         // convert mask to 3 channel (same as imgRect)
         Imgproc.cvtColor(imgRect, imgRect, Imgproc.COLOR_RGB2GRAY);
+        Imgproc.cvtColor(mask, mask, Imgproc.COLOR_RGB2GRAY);
         System.out.println("IMGRECT CHANNELS: " + imgRect.channels());
         System.out.println("MASK CHANNELS: " + mask.channels());
+        System.out.println("-------------------");
         
         
         //1
@@ -385,16 +387,42 @@ class FeatureDetection {
 //        resultROI.copyTo(result);
         
         //2
+        mask.convertTo(mask, CvType.CV_32FC3);
         Mat temp = new Mat(result.height(), result.width(), CvType.CV_32FC3);
+        Imgproc.cvtColor(mask, mask, Imgproc.COLOR_GRAY2RGB);
         Core.subtract(Mat.ones(mask.size(),CvType.CV_32FC3),mask,temp);
         
+        System.out.println("RESULT DIMENSIONS: " + result.size());
+        System.out.println("RESULT CHANNELS: " + result.channels());
+        System.out.println("TEMP DIMENSIONS: " + temp.size());
+        System.out.println("TEMP CHANNELS: " + temp.channels());
+        System.out.println("MASK DIMENSIONS: " + mask.size());
+        System.out.println("MASK CHANNELS: " + mask.channels());
+        System.out.println("-------------------");
         
+        r.height = result.height();
+        r.width = result.width();
+        System.out.println("RESULT DIMENSIONS: " + result.size());
+        System.out.println("RESULT TYPE: " + result.type());
+        temp.convertTo(temp, result.type());
+        System.out.println("TEMP DIMENSIONS: " + temp.size());
+        System.out.println("TEMP TYPE: " + temp.type());
+        System.out.println("R DIMENSIONS: " + r.size());
+        System.out.println("-------------------");
         Core.multiply(result.submat(r), temp, result.submat(r));
 //        result.submat(r).copyTo(result);
         
         //3
 //        img(r) = img(r) + imgRect
 //        Core.add(img1Rect, img2Rect, result);
+        System.out.println("RESULT DIMENSIONS: " + result.size());
+        System.out.println("RESULT TYPE: " + result.type());
+        System.out.println("RESULT CHANNELS: " + result.channels());
+        imgRect.convertTo(imgRect, result.type());
+        Imgproc.cvtColor(imgRect,imgRect,Imgproc.COLOR_GRAY2BGR);
+        System.out.println("IMGRECT DIMENSIONS: " + imgRect.size());
+        System.out.println("IMGRECT TYPE: " + imgRect.type());
+        System.out.println("IMGRECT CHANNELS: " + imgRect.channels());
         Core.add(result.submat(r), imgRect, result.submat(r));
 //        HighGui.imshow("why", temp);
 //        HighGui.imshow("how", result);
