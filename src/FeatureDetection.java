@@ -372,14 +372,16 @@ class FeatureDetection {
         
         Mat resized_mask = new Mat();
         Size maskSize = new Size(imgRect.width(), imgRect.height());
-        System.out.println("MASK SIZE: " + new Size(mask.width(), mask.height()));
-        Imgproc.resize(mask, resized_mask, maskSize);
-        System.out.println("IMGRECT SIZE: " + new Size(imgRect.width(), imgRect.height()));
-        System.out.println("RESIZED_MASK SIZE: " + new Size(resized_mask.width(), resized_mask.height()));
+        Imgproc.resize(mask, mask, maskSize);
+        
+        // convert mask to 3 channel (same as imgRect)
+        Imgproc.cvtColor(imgRect, imgRect, Imgproc.COLOR_RGB2GRAY);
+        System.out.println("IMGRECT CHANNELS: " + imgRect.channels());
+        System.out.println("MASK CHANNELS: " + mask.channels());
         
         
         //1
-        Core.multiply(imgRect, resized_mask, imgRect);
+        Core.multiply(imgRect, mask, imgRect);
 //        resultROI.copyTo(result);
         
         //2
