@@ -319,7 +319,7 @@ class FeatureDetection {
         
         // Get mask by filling triangle
 //        Mat mask = new Mat();
-        Mat mask = new Mat(new Size(img1.width(), img1.height()), CvType.CV_64FC1);
+        Mat mask = new Mat(new Size(img1.width(), img1.height()), img1.type());
 //        fillConvexPoly(mask, tRectInt, Scalar(1.0, 1.0, 1.0), 16, 0);
         MatOfPoint moo = new MatOfPoint();
         moo.fromList(tRectInt);
