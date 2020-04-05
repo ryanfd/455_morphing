@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.JFrame;
 import javax.xml.parsers.DocumentBuilder;
@@ -21,6 +22,7 @@ import org.opencv.core.MatOfKeyPoint;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
+import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.features2d.AKAZE;
 import org.opencv.features2d.DescriptorMatcher;
@@ -28,6 +30,7 @@ import org.opencv.features2d.Features2d;
 import org.opencv.highgui.HighGui;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.utils.Converters;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -41,8 +44,13 @@ class FeatureDetection {
     	ArrayList<DPolygon> destPolys=new ArrayList<DPolygon>();
     	
     	//read images (to be replaced by user input)
-    	Mat src1 = Imgcodecs.imread("smallDahyun.jpg", Imgcodecs.IMREAD_GRAYSCALE);
-    	Mat src2 = Imgcodecs.imread("jy_head.jpg", Imgcodecs.IMREAD_GRAYSCALE);
+    	Mat srcIn1 = Imgcodecs.imread("smallDahyun.jpg", Imgcodecs.IMREAD_ANYCOLOR);
+    	Mat srcIn2 = Imgcodecs.imread("jy_head.jpg", Imgcodecs.IMREAD_ANYCOLOR);
+    	Mat src1 = new Mat(1000, 1000, srcIn1.type());
+    	Mat src2 = new Mat(1000, 1000, srcIn2.type());
+    	srcIn1.copyTo(src1);
+    	srcIn2.copyTo(src2);
+    	Mat result = new Mat();
     	
     	if (src1.empty() || src2.empty()) {
     		System.err.print("Can't read image");
@@ -119,7 +127,7 @@ class FeatureDetection {
     	}
     	
     	/* check if our matches fit in homography model*/
-    	double inlierThreshold = 150; 
+    	double inlierThreshold = 100; 
     	List<KeyPoint> listOfInliers1 = new ArrayList<>();
     	List<KeyPoint> listOfInliers2 = new ArrayList<>();
     	List<DMatch> listOfGoodMatches = new ArrayList<>();
@@ -225,36 +233,31 @@ class FeatureDetection {
 		for (DPolygon poly:polys) {
 			System.out.println(destI);
 			//pick corresponding triangle in destination morph
-			Point[] srcTri = new Point[3];
-	        srcTri[0] = new Point( poly.polygon.get(0).x, poly.polygon.get(0).y );
-	        srcTri[1] = new Point( poly.polygon.get(1).x, poly.polygon.get(1).y );
-	        srcTri[2] = new Point( poly.polygon.get(2).x, poly.polygon.get(2).y );
+			ArrayList<Point> srcTri = new ArrayList<Point>();
+	        srcTri.add(new Point( poly.polygon.get(0).x, poly.polygon.get(0).y ));
+	        srcTri.add(new Point( poly.polygon.get(1).x, poly.polygon.get(1).y ));
+	        srcTri.add(new Point( poly.polygon.get(2).x, poly.polygon.get(2).y ));
 	        
-	        Point[] dstTri = new Point[3];
-	        dstTri[0] = new Point( destPolys.get(destI).polygon.get(0).x, destPolys.get(destI).polygon.get(0).y );
-	        dstTri[1] = new Point( destPolys.get(destI).polygon.get(1).x, destPolys.get(destI).polygon.get(1).y );
-	        dstTri[2] = new Point( destPolys.get(destI).polygon.get(2).x, destPolys.get(destI).polygon.get(2).y );
+	        ArrayList<Point> src2Tri = new ArrayList<Point>();
+	        src2Tri.add(new Point( polys2.get(destI).polygon.get(0).x, polys2.get(destI).polygon.get(0).y ));
+	        src2Tri.add(new Point( polys2.get(destI).polygon.get(1).x, polys2.get(destI).polygon.get(1).y ));
+	        src2Tri.add(new Point( polys2.get(destI).polygon.get(2).x, polys2.get(destI).polygon.get(2).y ));
+	        
+	        ArrayList<Point> dstTri = new ArrayList<Point>();
+	        dstTri.add(new Point( destPolys.get(destI).polygon.get(0).x, destPolys.get(destI).polygon.get(0).y ));
+	        dstTri.add(new Point( destPolys.get(destI).polygon.get(1).x, destPolys.get(destI).polygon.get(1).y ));
+	        dstTri.add(new Point( destPolys.get(destI).polygon.get(2).x, destPolys.get(destI).polygon.get(2).y ));
 
-			//get affine transform of trangle
-			Mat warpMat = Imgproc.getAffineTransform( new MatOfPoint2f(srcTri), new MatOfPoint2f(dstTri) );
-			
-			//use warpmat to transform all pixels inside the triangle into the warped image (aka for each pixel inside triangle, set into warp)
-			Mat warpDst = Mat.zeros( src1.rows(), src1.cols(), src1.type() );
-	        Imgproc.warpAffine( src1, warpDst, warpMat, warpDst.size() );
+	        Mat pm1 = new Mat();
 	        
-	        //need "DPoints" instead of regular points to calculate center
-	        DTriangle centerCalc = new DTriangle( destPolys.get(destI).polygon.get(0), 
-	        		destPolys.get(destI).polygon.get(1), 
-	        		destPolys.get(destI).polygon.get(2)
-	        		);
-	        double centerX = centerCalc.center.x, centerY = centerCalc.center.y;
+	         pm1 = Converters.vector_Point_to_Mat(srcTri);
 	        
-	        //create triangle mask for poly
-	        Mat mask = Mat.zeros(src1.rows(), src1.cols(), src1.type() );
-	        Imgproc.fillConvexPoly(mask, new MatOfPoint(dstTri), new Scalar(255), 8, 0);
+	        Mat pm2 = Converters.vector_Point_to_Mat(src2Tri);
+	        System.out.println(pm1);
+	        Mat pmDest = Converters.vector_Point_to_Mat(dstTri);
 	        
-	        //for each pixel
-	        
+	        result = morphTriangle(src1, src2, result, pm1, pm2, pmDest, poly, polys2.get(destI), destPolys.get(destI), 0.5);
+//	        System.out.println(destI);	        
 //	        		
 //	        Point center = new Point(centerX, centerY);
 //	        double angle = 0;
@@ -262,28 +265,136 @@ class FeatureDetection {
 //	        Mat rotMat = Imgproc.getRotationMatrix2D( center, angle, scale );
 //	        Mat warpRotateDst = new Mat();
 //	        Imgproc.warpAffine( warpDst, warpRotateDst, rotMat, warpDst.size() );
-	        HighGui.imshow( "Source image", mask );
-	        HighGui.imshow( "Warp", warpDst );
-	        HighGui.waitKey(0);
+	        HighGui.imshow( "Source image", src1 );
+//	        HighGui.waitKey(0);
 
 			++destI;
-		}
-		
-		//repeat for second image
-		for (DPolygon poly:polys2) {
-			
 		}
 		
 		
 //		DTriangle x=new DTriangle(new DPoint(0,0),new DPoint(100,0),new DPoint(10,10));
 		//System.out.println(bw.toString());
 	    JFrame window = new JFrame();
-	    window.setBounds(0, 0, 510, 525);
+	    window.setBounds(0, 0, 1000, 1000);
 	    //window.getContentPane().add(new Polygons(bw.getPolygons()));
 	    HashSet<DEdge> full_edges=bw.getPrunEdges();
 	    Kruskal k=new Kruskal(points,full_edges);
 	    window.getContentPane().add(new Lines(full_edges,k.getMST()));
 	    window.setVisible(true);
+    }
+    
+ // Apply affine transform calculated using srcTri and dstTri to src
+    void applyAffineTransform(Mat warpDst, Mat src, Point[] srcTri, Point[] dstTri)
+    {
+        
+        // Given a pair of triangles, find the affine transform.
+        Mat warpMat = Imgproc.getAffineTransform( new MatOfPoint2f(srcTri), new MatOfPoint2f(dstTri) );
+        
+        // Apply the Affine Transform just found to the src image
+        Imgproc.warpAffine( src, warpDst, warpMat, warpDst.size(), Imgproc.INTER_LINEAR);
+    }
+    
+ // Warps and alpha blends triangular regions from img1 and img2 to result
+    public Mat morphTriangle(Mat img1, Mat img2, Mat result, Mat t1, Mat t2, Mat tDest, DPolygon p1, DPolygon p2, DPolygon pDest, double alpha)
+    {
+        
+        // Find bounding rectangle for each triangle
+        Rect r = Imgproc.boundingRect(tDest);
+        Rect r1 = Imgproc.boundingRect(t1);
+        Rect r2 = Imgproc.boundingRect(t2);
+        
+        
+        // Offset points by left top corner of the respective rectangles
+        Point[] t1Rect = new Point[3], t2Rect = new Point[3], tRect = new Point[3];
+        ArrayList<Point> tRectInt = new ArrayList<Point>();
+        for(int i = 0; i < 3; i++)
+        {
+            tRect[i] = new Point( pDest.polygon.get(i).x - r.x, pDest.polygon.get(i).y -  r.y);
+            tRectInt.add(new Point(pDest.polygon.get(i).x - r.x, pDest.polygon.get(i).y - r.y)) ; // for fillConvexPoly
+            
+            t1Rect[i] = new Point( p1.polygon.get(i).x - r1.x, p1.polygon.get(i).y -  r1.y);
+            t2Rect[i] = new Point( p2.polygon.get(i).x - r2.x, p2.polygon.get(i).y  - r2.y);
+        }
+        
+        // Get mask by filling triangle
+        Mat mask = new Mat();
+//        fillConvexPoly(mask, tRectInt, Scalar(1.0, 1.0, 1.0), 16, 0);
+        MatOfPoint moo = new MatOfPoint();
+        moo.fromList(tRectInt);
+        Imgproc.fillConvexPoly(mask, moo, new Scalar(1.0, 1.0, 1.0), 16, 0);
+//        HighGui.imshow("test", mask);
+        
+        // Apply warpImage to small rectangular patches        
+        Mat img1Rect = new Mat();
+        Mat img2Rect = new Mat();
+        System.out.println(r2);
+        System.out.println(img2);
+        r2.height = r2.height - 10;
+        r2.width = r2.width - 10;
+        r1.height = r1.height - 10;
+        r1.width = r1.width - 10;
+        System.out.println(r1.x + " " + r1.y + " " + r2.height + r2.width);
+        
+        Mat sub1= img1.submat(r1);
+        Mat sub2= img2.submat(r2);
+        sub1.copyTo(img1Rect);
+        sub2.copyTo(img2Rect);
+        
+//        img1ROI = new Mat(img1Rect, r1);
+//        img2ROI = new Mat(img2Rect, r2);
+//        resultROI = new Mat(result, r);
+//        img1.submat(r1).copyTo(img1Rect);
+//        img2.submat(r2).copyTo(img2Rect);
+        
+        
+        
+        Mat warpImage1 = new Mat(img1.height(), img1.width(), img1.type());
+        Mat warpImage2 = new Mat(img2.height(), img2.width(), img1.type());
+        
+        
+        applyAffineTransform(warpImage1, img1Rect, t1Rect, tRect);
+        applyAffineTransform(warpImage2, img2Rect, t2Rect, tRect);
+//        applyAffineTransform(Mat warpDst, Mat src, Point[] srcTri, Point[] dstTri)
+//        applyAffineTransform(Mat warpDst, Mat src, Point[] srcTri, Point[] dstTri)
+        
+        // Alpha blend rectangular patches
+//        Mat imgRect = (1.0 - alpha) * warpImage1 + alpha * warpImage2;
+        Mat imgRect = new Mat(img1.height(), img1.width(), img1.type());
+        double beta = ( 1.0 - alpha );
+        Core.addWeighted( warpImage1, alpha, warpImage2, beta, 0.0, imgRect);
+        
+        // Copy triangular region of the rectangular patch to the output image
+     // Copy triangular region of the rectangular patch to the output image
+//        multiply(imgRect,mask, imgRect);
+//        multiply(img(r), Scalar(1.0,1.0,1.0) - mask, img(r));
+//        img(r) = img(r) + imgRect;
+        
+        //1
+        Core.multiply(imgRect, mask, imgRect);
+//        resultROI.copyTo(result);
+        
+        //2
+        Mat temp = new Mat(result.height(), result.width(), CvType.CV_32FC3);
+        Core.subtract(Mat.ones(mask.size(),CvType.CV_32FC3),mask,temp);
+        
+        
+        Core.multiply(result.submat(r), temp, result.submat(r));
+//        result.submat(r).copyTo(result);
+        
+        //3
+//        img(r) = img(r) + imgRect
+//        Core.add(img1Rect, img2Rect, result);
+        Core.add(result.submat(r), imgRect, result.submat(r));
+//        HighGui.imshow("why", temp);
+//        HighGui.imshow("how", result);
+//        try {
+//			TimeUnit.SECONDS.sleep(1);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+        return result;
+        
     }
 }
         
