@@ -418,7 +418,6 @@ class FeatureDetection {
         System.out.println("RESULT DIMENSIONS: " + result.size());
         System.out.println("RESULT TYPE: " + result.type());
         System.out.println("RESULT CHANNELS: " + result.channels());
-        imgRect.convertTo(imgRect, result.type());
         Imgproc.cvtColor(imgRect,imgRect,Imgproc.COLOR_GRAY2BGR);
         System.out.println("IMGRECT DIMENSIONS: " + imgRect.size());
         System.out.println("IMGRECT TYPE: " + imgRect.type());
