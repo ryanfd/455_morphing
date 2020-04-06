@@ -85,7 +85,6 @@ public class ImgPanel extends JPanel implements ActionListener {
 		h = (int) (morphTo.getHeight()/2);
 		x = (this.getWidth() - morphTo.getWidth(null));
 		this.setSize(w*5+100,h*4+50);
-		//		g.drawImage(morphTo, x,0,w,h,this);
 		this.setLayout(new GridBagLayout());
 		this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		this.add(displayImg);
