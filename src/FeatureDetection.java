@@ -128,7 +128,7 @@ class FeatureDetection {
     	}
     	
     	/* check if our matches fit in homography model*/
-    	double inlierThreshold = 150; 
+    	double inlierThreshold = 200; 
     	List<KeyPoint> listOfInliers1 = new ArrayList<>();
     	List<KeyPoint> listOfInliers2 = new ArrayList<>();
     	List<DMatch> listOfGoodMatches = new ArrayList<>();
@@ -260,7 +260,7 @@ class FeatureDetection {
 	        System.out.println(pm1);
 	        Mat pmDest = Converters.vector_Point_to_Mat(dstTri);
 	        
-	        result = morphTriangle(src1, src2, result, pm1, pm2, pmDest, poly, polys2.get(destI), destPolys.get(destI), 0.5);
+//	        result = morphTriangle(src1, src2, result, pm1, pm2, pmDest, poly, polys2.get(destI), destPolys.get(destI), 0.5);
 //	        System.out.println(destI);	        
 //	        		
 //	        Point center = new Point(centerX, centerY);

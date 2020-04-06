@@ -25,13 +25,13 @@ class Morphing extends JFrame {
 		this.setVisible(true);
 
 		//Anonymous inner-class listener to terminate program
-		this.addWindowListener(
-				new WindowAdapter(){//anonymous class definition
-					public void windowClosing(WindowEvent e){
-						System.exit(0);//terminate the program
-					}//end windowClosing()
-				}//end WindowAdapter
-				);//end addWindowListener
+//		this.addWindowListener(
+//				new WindowAdapter(){//anonymous class definition
+//					public void windowClosing(WindowEvent e){
+//						System.exit(0);//terminate the program
+//					}//end windowClosing()
+//				}//end WindowAdapter
+//				);//end addWindowListener
 		
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setSize(1500, 1000);
@@ -107,11 +107,12 @@ class Morphing extends JFrame {
 	public static void main(String[] args) 
 	{
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-//        FeatureDetection fd = new FeatureDetection();
+		Morphing img = new Morphing();// instantiate this object
+        FeatureDetection fd = new FeatureDetection();
         
 //        Morphing morph = new Morphing("GUI");
 	
-		Morphing img = new Morphing();// instantiate this object
+		
 //		img.repaint();// render the image
 	
 	}// end main
