@@ -1,8 +1,4 @@
-/*File Exercise1.java
-
- IAT455 - Workshop week 7
-
- **********************************************************/
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Frame;
@@ -16,11 +12,11 @@ import java.awt.image.WritableRaster;
 import java.io.File;
 
 import javax.imageio.ImageIO;
+import javax.swing.JFrame;
 
 import org.opencv.core.Core;
 
-class Morphing extends Frame { 
-
+class Morphing extends JFrame {
 	public Morphing() {
 		// constructor
 		// Get an image from the specified file in the current directory on the
@@ -36,7 +32,42 @@ class Morphing extends Frame {
 					}//end windowClosing()
 				}//end WindowAdapter
 				);//end addWindowListener
+		
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setSize(1500, 1000);
+		
+		ControlPanel cPanel = new ControlPanel();
+		ImgPanel panel = new ImgPanel(this.getSize(), cPanel);
+		this.add(panel);
+		
+		ImgPanel mainPanel = new ImgPanel(this.getSize(), cPanel);
+		setLayout(new BorderLayout());
+		add(mainPanel, BorderLayout.CENTER);
+		add(cPanel, BorderLayout.SOUTH);
+		
+		this.setVisible(true);
+		this.setResizable(false);
 	}// end constructor
+	
+	public Morphing(String title) 
+	{
+		super(title);
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setSize(2000, 1000);
+		
+		ControlPanel cPanel = new ControlPanel();
+		ImgPanel panel = new ImgPanel(this.getSize(), cPanel);
+		
+		this.add(panel);
+		
+		ImgPanel mainPanel = new ImgPanel(this.getSize(), cPanel);
+		setLayout(new BorderLayout());
+		add(mainPanel, BorderLayout.CENTER);
+		add(cPanel, BorderLayout.SOUTH);
+		
+		this.setVisible(true);
+		this.setResizable(false);
+	}
 	
 	// accessors
 	protected int getRed(int pixel) { return (pixel >>> 16) & 0xFF; }
@@ -76,9 +107,11 @@ class Morphing extends Frame {
 	public static void main(String[] args) 
 	{
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-        FeatureDetection fd = new FeatureDetection();
+//        FeatureDetection fd = new FeatureDetection();
+        
+//        Morphing morph = new Morphing("GUI");
 	
-//		Morphing img = new Morphing();// instantiate this object
+		Morphing img = new Morphing();// instantiate this object
 //		img.repaint();// render the image
 	
 	}// end main
